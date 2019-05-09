@@ -124,6 +124,7 @@ exports.queryStockInfo = key => {
 };
 
 exports.queryStockStatus = code => {
+    code = self._fixStockCode(code)
 	code = code.toUpperCase();
 	return fetchStockStatus(code)
 		.then(data => {
@@ -156,8 +157,16 @@ exports.queryStockListStatus = () => {
 		})
 };
 
+exports._fixStockCode = code =>{
+	if (code.length == 6){
+		return code.substr(0,1) == 6 ? "sh" + code : "sz"+code;
+	}else{
+		return code;
+	}
+};
+
 exports.addStock = code => {
-	
+	code = this._fixStockCode(code);
 	return Promise.all([readStockCodeFile(),exports.queryStockInfo(code)])
 		.then(results => {
 			let stockData = JSON.parse(results[0]);
@@ -179,6 +188,7 @@ exports.addStock = code => {
 };
 
 exports.removeStock = code => {
+    code = self._fixStockCode(code);
 	return readStockCodeFile()
 		.then(data => {
 			let stockData = JSON.parse(data);
